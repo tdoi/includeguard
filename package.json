@@ -1,0 +1,16 @@
+{
+  "name": "Include Guard",
+  "main": "./lib/includeguard",
+  "version": "0.0.0",
+  "description": "Support to input include guard for C/C++ headers.",
+  "activationCommands": {
+    "atom-workspace": "includeguard:insert"
+  },
+  "repository": "https://github.com/tdoi/includeguard",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "dependencies": {
+  }
+}
