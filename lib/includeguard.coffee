@@ -1,28 +1,29 @@
-IncludeguardView = require './includeguard-view'
 {CompositeDisposable} = require 'atom'
 
-module.exports = Includeguard =
-  includeguardView: null
-  modalPanel: null
-  subscriptions: null
+module.exports =
+  commands: null
 
-  activate: (state) ->
-    @includeguardView = new IncludeguardView(state.includeguardViewState)
-    @modalPanel = atom.workspace.addModalPanel(item: @includeguardView.getElement(), visible: false)
-
-    # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
-    @subscriptions = new CompositeDisposable
-
-    # Register command that toggles this view
-    @subscriptions.add atom.commands.add 'atom-workspace', 'includeguard:toggle': => @toggle()
+  activate: ->
+    @commands = new CompositeDisposable
+    @commands.add atom.commands.add 'atom-workspace',
+      'includeguard:insert': => @insert()
 
   deactivate: ->
-    @modalPanel.destroy()
-    @subscriptions.dispose()
-    @includeguardView.destroy()
+    @commands.dispose()
 
-  serialize: ->
-    includeguardViewState: @includeguardView.serialize()
+  insert: ->
+    if editor = atom.workspace.getActiveTextEditor()
+      filename = @getFilename(editor.getPath())
+      id = '__' + filename.replace('.', '_').toUpperCase() + '__'
+      buffer = "#pragma once \n" \
+        + "#ifndef" + id + "\n" \
+        + "#define" + id + "\n" \
+        + "\n" \
+        + editor.getText() \
+        + "\n" \
+        + "#endif" + "\n"
+      editor.setText(buffer)
 
-  toggle: ->
-    console.log 'Include Guard was inserted!'
+  getFilename:(path) ->
+    items = path.split("/")
+    items[items.length - 1]
